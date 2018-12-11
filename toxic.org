@@ -1,3 +1,4 @@
+
   :PROPERTIES:
   :header-args: :eval never-export
   :header-args:bash: :exports code
@@ -18,71 +19,80 @@
   pip install ipython jupyter_client jupyter_console numpy matplotlib pandas sklearn gensim seaborn cython
 #+END_SRC
 
-#+begin_src ipython  :results drawer :async t :session s :exports output
-  %matplotlib inline
-  import pandas as pd
-  import numpy as np
-  np.random.seed(1)
-  cats = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
-  train = pd.read_csv('./toxic/train.csv')
-  X = train.comment_text
-  y = train[cats]
-  print(X.shape)
-  print(y.head())
-#+end_src
+* Text Classification Using RNN
 
-#+RESULTS:
-:RESULTS:
-# Out[8]:
-:END:
+  #+begin_src ipython  :results drawer :async t :session s :exports output
+    %matplotlib inline
+    import pandas as pd
+    import numpy as np
+    train = pd.read_csv('./toxic/train.csv')
+    test = pd.read_csv('./toxic/test.csv')
+    truth = pd.read_csv('./toxic/test_labels.csv')
+    np.random.seed(1)
+    train.head()
+  #+end_src
 
+** Naive Bayes
 
-#+BEGIN_SRC ipython :session s
-  from gensim.models import FastText
-  from sklearn.naive_bayes import ComplementNB
-  X = train.comment_text
-  y = train[cats]
-  ft = FastText(X, size=4, window=3, min_count=1, iter=10)
-  fname = "./toxic/fasttext.model"
-  ft.save(fname)
-#+END_SRC
+   #+BEGIN_SRC ipython :results drawer :async t :session s :async
+     from sklearn.naive_bayes import ComplementNB
+     from sklearn.feature_extraction.text import CountVectorizer
+     from sklearn.pipeline import Pipeline
+     from sklearn.metrics import classification_report
 
-#+BEGIN_SRC ipython :session s
-  import multiprocessing
-  from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-  cores = multiprocessing.cpu_count()
-  size = 100
-  docs = [TaggedDocument(doc, [tag]) for tag, doc in enumerate(X)]
-  d2v = Doc2Vec(
-      docs,
-      vector_size=size,
-      window=10,
-      min_count=2,
-      workers=cores,
-      hs=0,
-      sample=0,
-      alpha=0.05)
-  d2v.train(docs, total_examples=len(docs), epochs=10)
-#+END_SRC
+     def train_naive_bayes(X, y):
+	 pl = Pipeline([
+	     ('vect', CountVectorizer()),
+	     ('clf', ComplementNB())
+	 ])
+	 return pl.fit(X, y)
 
-#+RESULTS:
-: # Out[9]:
-: : <gensim.models.fasttext.FastText at 0x7fd37b39bc18>
-#+BEGIN_SRC ipython :session s
-  from gensim.models import FastText
-  ft = FastText.load("./toxic/fasttext.model")
-  print(X[:10])
-  #  X  = np.array([ft[x] for x in X[:10]])
+     tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
+     train_X = train.comment_text
+     train_Y = train[tags]
+     nbs = [train_naive_bayes(train_X, train_Y[tag]) for tag in tags]
 
+     test_and_truth = test.merge(truth).query('threat != -1')
+     test_X = test_and_truth.comment_text
+     for nb, tag in zip(nbs, tags):
+	 pred = nb.predict(test_X)
+	 true = test_and_truth[tag]
+	 print('Accuracy:', np.mean(pred == true))
+	 print(classification_report(
+	    true, pred, target_names=['ok', tag]))
+  #+END_SRC  
 
-  # nb = ComplementNB()
-  # nb.fit(X, y)
-  # preds = np.predict()
-  # print(metrics.classification_report(
-  #     y_test, 
-  #     preds))
-#+END_SRC
+ #+BEGIN_SRC ipython :session s
+   import multiprocessing
+   from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+   cores = multiprocessing.cpu_count()
+   size = 100
+   docs = [TaggedDocument(doc, [tag]) for tag, doc in enumerate(X)]
+   d2v = Doc2Vec(
+       docs,
+       vector_size=size,
+       window=10,
+       min_count=2,
+       workers=cores,
+       hs=0,
+       sample=0,
+       alpha=0.05)
+   d2v.train(docs, total_examples=len(docs), epochs=10)
+ #+END_SRC
 
-#+RESULTS:
-: # Out[28]:
+  #+BEGIN_SRC ipython :session s
+    from gensim.models import FastText
+    train_X = train.comment_text
+    train_y = train[cats]
+    ft = FastText(train_X, size=4, window=3, min_count=1, iter=10)
+    fname = "./toxic/fasttext.model"
+    ft.save(fname)
+  #+END_SRC
+
+ #+BEGIN_SRC ipython :session s
+   from gensim.models import FastText
+   from 
+   ft = FastText.load("./toxic/fasttext.model")
+
+ #+END_SRC
 
