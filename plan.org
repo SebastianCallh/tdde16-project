@@ -1,0 +1,14 @@
+* Project plan and notes
+  This document contains a rough outline of the text mining project and some related thought that I need to put down someplace.
+
+** Project description
+   The project will try to solve the problem presented in the Kaggle [[https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data][Toxic Comment Classification Challenge]]. Like what everyone else is doing it will use an LSTM network (maybe GRU for hipster points) and a Naive Bayes as a baseline model.
+
+** Naive Bayes
+   Implementation based on [[https://people.csail.mit.edu/jrennie/papers/icml03-nb.pdf][this paper]]. The idea is to count word occurences, then use the complement counts for a category =c= to compute word weights instead of proper probabilities. One model for each class will be used. This method is supposedly better for very skewed data.
+
+** Neural Network
+   LSTM implementation. Could use doc2vec, feels like that would be better than feeding high dimensional sparse vectors to the network and letting it feature select. Not sure if I want to base this on a paper since that easily becomes increadibly avant garde. [[https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras][Useful link]] for a classic python ML blogpost doing some LSTM stuff. A single LSTM will be trained for all output classes.
+
+** SVM
+   Creating a model using doc2vec and an SVM classifier should be pretty simple and could be done if time permits. Like in the Naive Bayes case, one SVM per classification problem will be used.
