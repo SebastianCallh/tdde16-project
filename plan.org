@@ -1,5 +1,11 @@
 * Project plan and notes
   This document contains a rough outline of the text mining project and some related thought that I need to put down someplace.
+** Notes
+*** Naive Bayes has great performance
+    NB has great performance! It was kind of known that it would perform good before, but still. A summary of the performance can be seen in [[file:complement-nb-summary.txt][this file]].
+
+*** There is a lot of pre-processing that has to be done
+    Apparently there is a lot of garbage tweets. Some contain only urls or numbers, and some are not in english which breaks the embedding since they are only trained on an english vocabulary.
 
 ** Project description
    The project will try to solve the problem presented in the Kaggle [[https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data][Toxic Comment Classification Challenge]]. Like what everyone else is doing it will use an LSTM network (maybe GRU for hipster points) and a Naive Bayes as a baseline model.
@@ -8,7 +14,11 @@
    Implementation based on [[https://people.csail.mit.edu/jrennie/papers/icml03-nb.pdf][this paper]]. The idea is to count word occurences, then use the complement counts for a category =c= to compute word weights instead of proper probabilities. One model for each class will be used. This method is supposedly better for very skewed data.
 
 ** Neural Network
-   LSTM implementation. Could use doc2vec, feels like that would be better than feeding high dimensional sparse vectors to the network and letting it feature select. Not sure if I want to base this on a paper since that easily becomes increadibly avant garde. [[https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras][Useful link]] for a classic python ML blogpost doing some LSTM stuff. A single LSTM will be trained for all output classes.
+*** Word Embeddings
+    Before the classifier is run the words need to be embedded into a vector space. [[http://www.aclweb.org/anthology/D14-1162][This paper]] is on Glove, but still contains some benchmarks word vector size to start with
+
+*** Classifier
+    LSTM implementation. Could use doc2vec, feels like that would be better than feeding high dimensional sparse vectors to the network and letting it feature select. Not sure if I want to base this on a paper since that easily becomes increadibly avant garde. [[https://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras][Useful link]] for a classic python ML blogpost doing some LSTM stuff. A single LSTM will be trained for all output classes.
 
 ** SVM
    Creating a model using doc2vec and an SVM classifier should be pretty simple and could be done if time permits. Like in the Naive Bayes case, one SVM per classification problem will be used.
