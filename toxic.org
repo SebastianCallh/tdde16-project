@@ -1,4 +1,5 @@
 
+
   :PROPERTIES:
   :header-args: :eval never-export
   :header-args:bash: :exports code
@@ -23,36 +24,49 @@
 
   #+begin_src ipython  :results drawer :async t :session s :exports output
     %matplotlib inline
+    from keras.preprocessing import sequence
+    from keras.preprocessing.text import Tokenizer
     import pandas as pd
     import numpy as np
+    np.random.seed(1)
+
+    # Load data
     train = pd.read_csv('./toxic/train.csv')
     test = pd.read_csv('./toxic/test.csv')
     truth = pd.read_csv('./toxic/test_labels.csv')
     tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
-    train_X = train.comment_text
+
+    # Create tokenizer
+    max_tweet_length = 140
+    n_words = 5000 # n most common words
+    train_docs = list(train.comment_text.values)
+    tokenizer = Tokenizer(num_words=n_words)
+    tokenizer.fit_on_texts(train_docs)
+
+    # Integer representation of training data
+    train_X = sequence.pad_sequences(
+	sequences=tokenizer.texts_to_sequences(train_docs), 
+	maxlen=max_tweet_length)
     train_Y = train[tags]
+
+    # Integer representation of test data
+    # There are duds in the test set, which we filter out
     test_and_truth = test.merge(truth).query('threat != -1')
-    test_X = test_and_truth.comment_text
+    test_docs = list(test_and_truth.comment_text.values)
+    test_X = sequence.pad_sequences(
+	sequences=tokenizer.texts_to_sequences(test_docs),
+	maxlen=max_tweet_length)
     test_Y = test_and_truth[tags]
-    np.random.seed(1)
   #+end_src
 
   #+RESULTS:
   :RESULTS:
-  # Out[65]:
-  #+BEGIN_EXAMPLE
-    severe_toxic  obscene  threat  insult  identity_hate
-    5              0        0       0       0              0
-    7              0        0       0       0              0
-    11             0        0       0       0              0
-    13             0        0       0       0              0
-    14             0        0       0       0              0
-  #+END_EXAMPLE
+  # Out[2]:
   :END:
 
 ** Naive Bayes
 
-   #+BEGIN_SRC ipython :results drawer :async t :session s :async
+   #+BEGIN_SRC ipython :results output :async t :session s :async
      from sklearn.naive_bayes import ComplementNB
      from sklearn.feature_extraction.text import CountVectorizer
      from sklearn.pipeline import Pipeline
@@ -65,15 +79,72 @@
 	 ])
 	 return pl.fit(X, y)
 
-     nbs = [train_naive_bayes(train_X, train_Y[tag]) for tag in tags]
+     nb_train_X = train.comment_text
+     nb_train_y = train[tags]
+     nbs = [train_naive_bayes(nb_train_X, nb_train_y[tag]) for tag in tags]
 
+     nb_test_X = test_and_truth.comment_text
      for nb, tag in zip(nbs, tags):
-	 pred = nb.predict(test_X)
+	 pred = nb.predict(nb_test_X)
 	 true = test_and_truth[tag]
 	 print('Accuracy:', np.mean(pred == true))
 	 print(classification_report(
 	    true, pred, target_names=['ok', tag]))
   #+END_SRC  
+
+  #+RESULTS:
+  #+begin_example
+  Accuracy: 0.9498890243521211
+		precision    recall  f1-score   support
+
+	    ok       1.00      0.95      0.97     63611
+  severe_toxic       0.07      0.59      0.12       367
+
+     micro avg       0.95      0.95      0.95     63978
+     macro avg       0.53      0.77      0.55     63978
+  weighted avg       0.99      0.95      0.97     63978
+
+  Accuracy: 0.909468879927475
+		precision    recall  f1-score   support
+
+	    ok       0.98      0.92      0.95     60287
+       obscene       0.36      0.71      0.48      3691
+
+     micro avg       0.91      0.91      0.91     63978
+     macro avg       0.67      0.82      0.71     63978
+  weighted avg       0.95      0.91      0.92     63978
+
+  Accuracy: 0.9722873487761418
+		precision    recall  f1-score   support
+
+	    ok       1.00      0.98      0.99     63767
+	threat       0.01      0.09      0.02       211
+
+     micro avg       0.97      0.97      0.97     63978
+     macro avg       0.50      0.53      0.50     63978
+  weighted avg       0.99      0.97      0.98     63978
+
+  Accuracy: 0.9085466879239739
+		precision    recall  f1-score   support
+
+	    ok       0.98      0.92      0.95     60551
+	insult       0.33      0.66      0.44      3427
+
+     micro avg       0.91      0.91      0.91     63978
+     macro avg       0.65      0.79      0.69     63978
+  weighted avg       0.94      0.91      0.92     63978
+
+  Accuracy: 0.9528587952108537
+		 precision    recall  f1-score   support
+
+	     ok       0.99      0.96      0.98     63266
+  identity_hate       0.09      0.38      0.15       712
+
+      micro avg       0.95      0.95      0.95     63978
+      macro avg       0.54      0.67      0.56     63978
+   weighted avg       0.98      0.95      0.97     63978
+
+  #+end_example
 
  #+BEGIN_SRC ipython :session s
    import multiprocessing
@@ -92,56 +163,74 @@
        alpha=0.05)
    d2v.train(docs, total_examples=len(docs), epochs=10)
  #+END_SRC
-
+ 
 ** Embeddings with FastText
    #+BEGIN_SRC ipython :session s
+     import re
      min_len = 2
-     def tokenize(phrase):
-	 return [w.lower() for w in phrase.split() 
+     def f(w): 
+	 w = w.lower()
+	 #w = re.sub(r'^https?:\/\/.*[\r\n]*', '', w, flags=re.MULTILINE)
+	 return w
+
+     def tokenize(phrase):	 
+	 return [f(w) for w in phrase.split() 
 		 if w.isalpha()
 		 and len(w) >= min_len]
+
+     for x in train[train.comment_text.str.contains('qf')].comment_text:
+	 print(tokenize(x))
    #+END_SRC
 
    #+RESULTS:
-   : # Out[123]:
+   : # Out[68]:
 
    #+BEGIN_SRC ipython :session s
      from gensim.models import FastText
      vocabulary = train_X.apply(tokenize)
+     vocabulary = vocabulary[vocabulary.transform(lambda x: len(x) > min_len)]
      ft = FastText(vocabulary, size=200, window=6, min_count=min_len, iter=10)
-     fname = "./toxic/fasttext.model"
+     fname = "./toxic/fasttext.bin"
      ft.save(fname)
-   #+END_SRC
 
-   #+RESULTS:
-   : # Out[105]:
-
-** Classification with LSTM Network
-   #+BEGIN_SRC ipython :session s
-     from gensim.models import FastText
-     from keras.models import Sequential
-     from keras.layers import Dense, LSTM
-
-     tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
-     #ft = FastText.load("./toxic/fasttext.model")
-
-
+     # Word embed stuff
      def mean_vector_embed(phrases):
 	 token_lists = phrases.apply(tokenize)
-	 non_empty_token_lists = token_lists[token_lists.transform(lambda x: len(x) > 0)]
-	 word_vectors = [np.mean(ft.wv[ts], axis=1) for ts in non_empty_token_lists]
+	 non_empty_token_lists = token_lists[token_lists.transform(lambda x: len(x) > min_len)]
+	 for x in non_empty_token_lists:
+	     if x not in ft.wv:
+		 print(x)
+
+	 print(non_empty_token_lists)
+	 word_vectors = [np.mean(ft[ts], axis=1) for ts in non_empty_token_lists]
 	 return word_vectors
 
      input_vectors = mean_vector_embed(train_X)
-     labels = train_Y
+   #+END_SRC
+
+   #+RESULTS:
+   : # Out[56]:
+
+** Classification with LSTM Network
+   #+BEGIN_SRC ipython :results output :session s
+     from gensim.models import FastText
+     from keras.models import Sequential
+     from keras.layers import Dense, LSTM
+     from keras.layers.embeddings import Embedding
+
+     tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
+     #ft = FastText.load("./toxic/fasttext.bin")
+     n_hidden = 64
      m = Sequential()
+     m.add(Embedding(n_words, n_hidden, input_length=max_tweet_length))
      m.add(LSTM(50))
      m.add(Dense(len(tags), activation='softmax'))
      m.compile(loss='categorical_crossentropy', 
 	       optimizer='adam', 
 	       metrics=['accuracy'])
 
-     m.fit(input_vectors, labels, epochs=3, batch_size=64)
-     scores = m.evaluate(test_X, test_y, verbose=0)
-     print("Accuracy: %.2f%" % (scores[1]))
+     m.fit(train_X, train_Y , epochs=3, batch_size=64)
+     scores = m.evaluate(test_X, test_Y, verbose=0)
+     print("Loss: %.2f" % scores[0])
+     print("Accuracy: %.2f" % scores[1])
   #+END_SRC
