@@ -61,7 +61,7 @@
 
   #+RESULTS:
   :RESULTS:
-  # Out[2]:
+  # Out[1]:
   :END:
 
 ** Naive Bayes
@@ -212,7 +212,7 @@
    : # Out[56]:
 
 ** Classification with LSTM Network
-   #+BEGIN_SRC ipython :results output :session s
+   #+BEGIN_SRC ipython :session s :async
      from gensim.models import FastText
      from keras.models import Sequential
      from keras.layers import Dense, LSTM
@@ -221,16 +221,23 @@
      tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
      #ft = FastText.load("./toxic/fasttext.bin")
      n_hidden = 64
+     n_epochs = 3
+     batch_size = 128
      m = Sequential()
      m.add(Embedding(n_words, n_hidden, input_length=max_tweet_length))
      m.add(LSTM(50))
-     m.add(Dense(len(tags), activation='softmax'))
-     m.compile(loss='categorical_crossentropy', 
+     m.add(Dense(len(tags), activation='sigmoid'))
+     m.compile(loss='binary_crossentropy', 
 	       optimizer='adam', 
 	       metrics=['accuracy'])
 
-     m.fit(train_X, train_Y , epochs=3, batch_size=64)
+     m.fit(train_X, train_Y , epochs=n_epochs, batch_size=batch_size)
      scores = m.evaluate(test_X, test_Y, verbose=0)
      print("Loss: %.2f" % scores[0])
      print("Accuracy: %.2f" % scores[1])
   #+END_SRC
+
+   #+BEGIN_SRC ipython :session s
+     print("Loss: %.2f" % scores[0])
+     print("Accuracy: %.2f" % scores[1])
+   #+END_SRC
