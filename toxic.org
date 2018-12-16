@@ -236,8 +236,3 @@
      print("Loss: %.2f" % scores[0])
      print("Accuracy: %.2f" % scores[1])
   #+END_SRC
-
-   #+BEGIN_SRC ipython :session s
-     print("Loss: %.2f" % scores[0])
-     print("Accuracy: %.2f" % scores[1])
-   #+END_SRC
