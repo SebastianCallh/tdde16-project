@@ -23,9 +23,6 @@
 	draft=false,				% value for draft version
 ]{scrreprt}%
 
-\bibliography{lesson7a1} 
-\bibliographystyle{ieeetr}
-
 % **************************************************
 % Debug LaTeX Information
 % **************************************************
@@ -59,11 +56,13 @@
 \newcommand{\thesisUniversityStreetAddress}{Street address}
 \newcommand{\thesisUniversityPostalCode}{Postal Code}
 
+
 % **************************************************
 % Load and Configure Packages
 % **************************************************
 \usepackage[utf8]{inputenc}		% defines file's character encoding
 \usepackage[english]{babel} % babel system, adjust the language of the content
+\usepackage{float}
 \usepackage[					% clean thesis style
 	figuresep=colon,%
 	sansserif=false,%
@@ -75,16 +74,26 @@
 % LLT: Use biber if using UTF8 encoding
 % 	bibsys=bibtex,%
 	bibsys=biber,%
-	bibfile=bib-refs,%
-	bibstyle=alphabetic,%
+	bibfile=references,%
+%	bibstyle=alphabetic,%
 ]{cleanthesis}
+
+
+%\documentclass[a4paper, 11pt]{book} % A4 paper size and default 11pt font size
+
+%\newcommand*{\plogo}{\fbox{$\mathcal{PL}$}} % Generic dummy publisher logo
+
+%\usepackage[utf8]{inputenc} % Required for inputting international characters
+%\usepackage[T1]{fontenc} % Output font encoding for international characters
+%\usepackage{stix} % Use the STIX fonts
+
 
 \hypersetup{					% setup the hyperref-package options
 	pdftitle={\thesisTitle},	% 	- title (PDF meta)
 	pdfsubject={\thesisSubject},% 	- subject (PDF meta)
 	pdfauthor={\thesisName},	% 	- author (PDF meta)
 	plainpages=false,			% 	-
-	colorlinks=false,			% 	- colorize links?
+	colorlinks=true,			% 	- colorize links?
 	pdfborder={0 0 0},			% 	-
 	breaklinks=true,			% 	- allow line break inside links
 	bookmarksnumbered=true,		%
@@ -116,25 +125,30 @@
 \input{content/abstract}		% INCLUDE: the abstracts (english and german)
 \cleardoublepage
 %
-\input{content/acknowledgement} % INCLUDE: acknowledgement
+
+%\input{content/acknowledgement} % INCLUDE: acknowledgement
 \cleardoublepage
 %
 \setcounter{tocdepth}{2}		% define depth of toc
 \tableofcontents				% display table of contents
 \cleardoublepage
-
+\listoffigures
+\listoftables
 % --------------------------
 % Body matter
 % --------------------------
+
 \pagenumbering{arabic}			% arabic page numbering
 \setcounter{page}{1}			% set page counter
 \pagestyle{maincontentstyle} 	% fancy header and footer
 
-\input{content/chapter-introduction} % INCLUDE: introduction
-\input{content/chapter-related-work} % INCLUDE: related work
-\input{content/chapter-system}	% INCLUDE: system
-\input{content/chapter-concepts} % INCLUDE: concepts
-\input{content/chapter-conclusion} % INCLUDE: conclusion
+\input{content/introduction}
+\input{content/theory} 
+\input{content/data}	
+\input{content/method}	
+\input{content/results} 
+\input{content/discussion} 
+\input{content/conclusion} 
 \cleardoublepage
 
 % --------------------------
@@ -150,16 +164,14 @@
 }
 \cleardoublepage
 
-\listoffigures
-\cleardoublepage
+%\cleardoublepage
 
-\listoftables
-\cleardoublepage
+%\cleardoublepage
 
-\input{content/colophon}
-\cleardoublepage
+%\input{content/colophon}
+%\cleardoublepage
 
-\input{content/declaration}
+%\input{content/declaration}
 \clearpage
 \newpage
 \mbox{}
