@@ -17,3 +17,9 @@ Training of RNNs is done using the \textit{backpropagation} algorithm, which is 
 \subsection{Long Short-Term Memory Networks}
 LSTMs are RNNs with a more complicated cell structure for the hidden units, which have shown to much better capture long-term dependencies than the simpler structure of standard hidden units~\cite{hochreiter1997long}. They work by containing an internal state which is regulated by the input.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{graphics/lstm-cell}
+  \caption{An illustration of an LSTM cell where $x$ is input, $y$ output and $s$ cell state for a specific time point. $\sigma$ indicates a linear combination of inputs passed through the sigmoid function. }\label{fig:lstm-cell}
+\end{figure}
+As can be seen in Figure~\ref{fig:lstm-cell} an LSTM propagates both the previous output $y^{(t-1)}$ and the previous state $s^{(t-1)}$ to the next cell. This comes at the cost of several more weights that need to be optimized during training, but is a key component for their performance.
