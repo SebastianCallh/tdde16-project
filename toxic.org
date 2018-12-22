@@ -22,50 +22,134 @@
 
 * Text Classification Using RNN
 
-  #+begin_src ipython  :results drawer :async t :session s :exports output
-    %matplotlib inline
-    from keras.preprocessing import sequence
-    from keras.preprocessing.text import Tokenizer
-    import pandas as pd
-    import numpy as np
-    np.random.seed(1)
+** Loading the data
+   #+begin_src ipython  :results drawer :async t :session s :exports output
+     %matplotlib inline
+     from keras.preprocessing import sequence
+     from keras.preprocessing.text import Tokenizer
+     import pandas as pd
+     import numpy as np
+     np.random.seed(1)
 
-    # Load data
-    train = pd.read_csv('./toxic/train.csv')
-    test = pd.read_csv('./toxic/test.csv')
-    truth = pd.read_csv('./toxic/test_labels.csv')
-    tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
+     # Load data
+     train = pd.read_csv('./toxic/train.csv')
+     test = pd.read_csv('./toxic/test.csv')
+     truth = pd.read_csv('./toxic/test_labels.csv')
+     tags = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
 
-    # Create tokenizer
-    max_tweet_length = 140
-    n_words = 5000 # n most common words
-    train_docs = list(train.comment_text.values)
-    tokenizer = Tokenizer(num_words=n_words)
-    tokenizer.fit_on_texts(train_docs)
+     # Create tokenizer
+     max_tweet_length = 140
+     n_words = 5000 # n most common words
+     train_docs = list(train.comment_text.values)
+     tokenizer = Tokenizer(num_words=n_words)
+     tokenizer.fit_on_texts(train_docs)
 
-    # Integer representation of training data
-    train_X = sequence.pad_sequences(
-	sequences=tokenizer.texts_to_sequences(train_docs), 
-	maxlen=max_tweet_length)
-    train_Y = train[tags]
+     # Integer representation of training data
+     train_X = sequence.pad_sequences(
+	 sequences=tokenizer.texts_to_sequences(train_docs), 
+	 maxlen=max_tweet_length)
+     train_Y = train[tags]
 
-    # Integer representation of test data
-    # There are duds in the test set, which we filter out
-    test_and_truth = test.merge(truth).query('threat != -1')
-    test_docs = list(test_and_truth.comment_text.values)
-    test_X = sequence.pad_sequences(
-	sequences=tokenizer.texts_to_sequences(test_docs),
-	maxlen=max_tweet_length)
-    test_Y = test_and_truth[tags]
-  #+end_src
+     # Integer representation of test data
+     # There are duds in the test set, which we filter out
+     test_and_truth = test.merge(truth).query('threat != -1')
+     test_docs = list(test_and_truth.comment_text.values)
+     test_X = sequence.pad_sequences(
+	 sequences=tokenizer.texts_to_sequences(test_docs),
+	 maxlen=max_tweet_length)
+     test_Y = test_and_truth[tags]
+   #+end_src
 
-  #+RESULTS:
-  :RESULTS:
-  # Out[1]:
-  :END:
+   #+RESULTS:
+   :RESULTS:
+   0 - 6c92c39a-0a37-42de-9d0a-fcd0d146e1ff
+   :END:
+
+** Exploring the data
+    #+BEGIN_SRC ipython :session s :async :results latex
+      %matplotlib inline
+      import numpy as np
+      import pandas as pd
+
+      # Load data
+      train = pd.read_csv('./toxic/train.csv')
+      test = pd.read_csv('./toxic/test.csv')
+      truth = pd.read_csv('./toxic/test_labels.csv')
+      tags = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
+
+    #+END_SRC
+
+    #+RESULTS:
+    #+BEGIN_EXPORT latex
+    # Out[34]:
+    #+END_EXPORT
+
+    #+BEGIN_SRC ipython :session s
+      def f(o):
+	  if (o.toxic == 0) \
+	  and (o.severe_toxic == 0) \
+	  and (o.obscene == 0) \
+	  and (o.threat == 0) \
+	  and (o.insult == 0) \
+	  and (o.identity_hate == 0):
+	    return 1
+	  else: 
+	    return 0
+
+      label_df = train[tags].copy()
+      label_df['ok'] = 0
+      label_df.ok = label_df.apply(f, axis=1)
+      label_df.head()
+    #+END_SRC
+
+      #+RESULTS:
+      : # Out[18]:
+      : #+BEGIN_EXAMPLE
+      :   toxic  severe_toxic  obscene  threat  insult  identity_hate  ok
+      :   0      0             0        0       0       0              0   1
+      :   1      0             0        0       0       0              0   1
+      :   2      0             0        0       0       0              0   1
+      :   3      0             0        0       0       0              0   1
+      :   4      0             0        0       0       0              0   1
+      : #+END_EXAMPLE
+
+      Barplot of label counts
+    #+BEGIN_SRC ipython :session s :results drawer
+      import matplotlib.pyplot as plt
+      import matplotlib as mpl
+      mpl.style.use('seaborn')
+      plot_tags = ['ok'] + tags
+      counts = [sum(label_df[tag]) for tag in plot_tags]
+      y_pos = np.arange(len(plot_tags))
+      plt.bar(y_pos, counts, align='center', alpha=0.5)
+      plt.xticks(y_pos, plot_tags)
+      plt.ylabel('Count')
+      plt.title('Labels')
+      plt.show()
+      #+END_SRC
+
+    #+RESULTS:
+    :RESULTS:
+    # Out[37]:
+    [[file:./obipy-resources/hS6TSM.png]]
+    :END:
+
+    Histogram of comment word count
+    #+BEGIN_SRC ipython :session s :results drawer
+      import seaborn as sns
+      lengths = train.comment_text.apply(lambda x: len(x.split()))
+      ax = sns.distplot(lengths)
+      ax.set(xlabel='Length', ylabel='Density')
+    #+END_SRC
+
+    #+RESULTS:
+    :RESULTS:
+    # Out[43]:
+    : [Text(0, 0.5, 'Density'), Text(0.5, 0, 'Length')]
+    [[file:./obipy-resources/mEM2xZ.png]]
+    :END:
 
 ** Naive Bayes
-
    #+BEGIN_SRC ipython :results output :async t :session s :async
      from sklearn.naive_bayes import ComplementNB
      from sklearn.feature_extraction.text import CountVectorizer
@@ -218,7 +302,7 @@
      from keras.layers import Dense, LSTM
      from keras.layers.embeddings import Embedding
 
-     tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
+     tags = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
      #ft = FastText.load("./toxic/fasttext.bin")
      n_hidden = 64
      n_epochs = 3
@@ -236,3 +320,4 @@
      print("Loss: %.2f" % scores[0])
      print("Accuracy: %.2f" % scores[1])
   #+END_SRC
+  
