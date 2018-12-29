@@ -1,146 +1,102 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Thin Sectioned Essay
+% LaTeX Template
+% Version 1.0 (3/8/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original Author:
+% Nicolas Diaz (nsdiaz@uc.cl) with extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% LLT: Turn off some annoying warnings...
-\RequirePackage{silence}
-\WarningFilter{titlesec}{Non standard sectioning command}
-\WarningFilter{scrreprt}{Usage of package}
-\WarningFilter{scrreprt}{Activating an ugly workaround}
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
 
-% **************************************************
-% Document Class Definition
-% **************************************************
-\documentclass[%
-	paper=A4,					% paper size --> A4 is default in Germany
-	twoside=true,				% onesite or twoside printing
-	openright,					% doublepage cleaning ends up right side
-	parskip=full,				% spacing value / method for paragraphs
-	chapterprefix=true,			% prefix for chapter marks
-	11pt,						% font size
-	headings=normal,			% size of headings
-	bibliography=totoc,			% include bib in toc
-	listof=totoc,				% include listof entries in toc
-	titlepage=on,				% own page for each title page
-	captions=tableabove,		% display table captions above the float env
-	draft=false,				% value for draft version
-]{scrreprt}%
+\documentclass[a4paper 11pt]{report} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
 
-% **************************************************
-% Debug LaTeX Information
-% **************************************************
-%\listfiles
+\usepackage{titlesec}
+ 
+%\titleformat{\chapter}[display]
+% {\normalfont\bfseries}{}{0pt}{\Huge}
 
-% **************************************************
-% Information and Commands for Reuse
-% **************************************************
-\newcommand{\thesisTitle}{The Clean Thesis Style}
-\newcommand{\thesisName}{Ricardo Langner}
-\newcommand{\thesisSubject}{Documentation}
-\newcommand{\thesisDate}{August 26, 2015}
-\newcommand{\thesisVersion}{My First Draft}
+\titleformat{\chapter}[display]
+    {\normalfont\huge\bfseries}{}{-50pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{0pt}{30pt}
+  
+%\usepackage[margin=1in]{geometry}  
+%\addtolength{\topmargin}{-.875in}
 
-\newcommand{\thesisFirstReviewer}{Jane Doe}
-\newcommand{\thesisFirstReviewerUniversity}{\protect{Clean Thesis Style University}}
-\newcommand{\thesisFirstReviewerDepartment}{Department of Clean Thesis Style}
-
-\newcommand{\thesisSecondReviewer}{John Doe}
-\newcommand{\thesisSecondReviewerUniversity}{\protect{Clean Thesis Style University}}
-\newcommand{\thesisSecondReviewerDepartment}{Department of Clean Thesis Style}
-
-\newcommand{\thesisFirstSupervisor}{Jane Doe}
-\newcommand{\thesisSecondSupervisor}{John Smith}
-
-\newcommand{\thesisUniversity}{\protect{Clean Thesis Style University}}
-\newcommand{\thesisUniversityDepartment}{Department of Clean Thesis Style}
-\newcommand{\thesisUniversityInstitute}{Institut for Clean Thesis Dev}
-\newcommand{\thesisUniversityGroup}{Clean Thesis Group (CTG)}
-\newcommand{\thesisUniversityCity}{City}
-\newcommand{\thesisUniversityStreetAddress}{Street address}
-\newcommand{\thesisUniversityPostalCode}{Postal Code}
-
-
-% **************************************************
-% Load and Configure Packages
-% **************************************************
-\usepackage[utf8]{inputenc}		% defines file's character encoding
-\usepackage[english]{babel} % babel system, adjust the language of the content
+\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{graphicx} % Required for including pictures
+\usepackage{wrapfig} % Allows in-line images
 \usepackage{float}
-\usepackage[					% clean thesis style
-	figuresep=colon,%
-	sansserif=false,%
-	hangfigurecaption=false,%
-	hangsection=true,%
-	hangsubsection=true,%
-	colorize=full,%
-	colortheme=bluemagenta,%
-% LLT: Use biber if using UTF8 encoding
-% 	bibsys=bibtex,%
-	bibsys=biber,%
-	bibfile=references,%
-%	bibstyle=alphabetic,%
-]{cleanthesis}
+\usepackage{graphics}
+\usepackage{amsmath}
+\usepackage{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Required for accented characters
+\usepackage{url}
+\linespread{1.05} % Change line spacing here, Palatino benefits from a slight increase by default
+
+\makeatletter
+%\renewcommand\@biblabel[1]{\textbf{#1.}} % Change the square brackets for each bibliography item from '[1]' to '1.'
+%\renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
 
 
-%\documentclass[a4paper, 11pt]{book} % A4 paper size and default 11pt font size
+\renewcommand{\thesection}{}
 
-%\newcommand*{\plogo}{\fbox{$\mathcal{PL}$}} % Generic dummy publisher logo
+\renewcommand{\maketitle}{ % Customize the title - do not edit title and author name here, see the TITLE block below
+\begin{flushright} % Right align
+{\LARGE\@title} % Increase the font size of the title
 
-%\usepackage[utf8]{inputenc} % Required for inputting international characters
-%\usepackage[T1]{fontenc} % Output font encoding for international characters
-%\usepackage{stix} % Use the STIX fonts
+\vspace{50pt} % Some vertical space between the title and author name
 
+{\large\@author} % Author name
+\\\@date % Date
 
-\hypersetup{					% setup the hyperref-package options
-	pdftitle={\thesisTitle},	% 	- title (PDF meta)
-	pdfsubject={\thesisSubject},% 	- subject (PDF meta)
-	pdfauthor={\thesisName},	% 	- author (PDF meta)
-	plainpages=false,			% 	-
-	colorlinks=true,			% 	- colorize links?
-	pdfborder={0 0 0},			% 	-
-	breaklinks=true,			% 	- allow line break inside links
-	bookmarksnumbered=true,		%
-	bookmarksopen=true			%
+\vspace{40pt} % Some vertical space between the author block and abstract
+\end{flushright}
 }
 
-% **************************************************
-% Document CONTENT
-% **************************************************
+        
+%----------------------------------------------------------------------------------------
+%	TITLE
+%----------------------------------------------------------------------------------------
+
+\title{\textbf{Wikipedia Comment Classification}\\ % Title
+} % Subtitle
+
+\author{\textsc{Sebastian Callh} % Author
+\\{\textit{Linköping Univerty}}} % Institution
+
+\date{\today} % Date
+
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 
-% --------------------------
-% rename document parts
-% --------------------------
-%\renewcaptionname{ngerman}{\figurename}{Abb.}
-%\renewcaptionname{ngerman}{\tablename}{Tab.}
-\renewcaptionname{english}{\figurename}{Fig.}
-\renewcaptionname{english}{\tablename}{Tab.}
+\maketitle % Print the title section
 
-% --------------------------
-% Front matter
-% --------------------------
-\pagenumbering{roman}			% roman page numbing (invisible for empty page style)
-\pagestyle{empty}				% no header or footers
-\input{content/titlepages}		% INCLUDE: all titlepages
-\cleardoublepage
+%----------------------------------------------------------------------------------------
+%	ABSTRACT AND KEYWORDS
+%----------------------------------------------------------------------------------------
 
-\pagestyle{plain}				% display just page numbers
-\input{content/abstract}		% INCLUDE: the abstracts (english and german)
-\cleardoublepage
-%
+%\renewcommand{\abstractname}{Summary} % Uncomment to change the name of the abstract to something else
+\input{content/abstract}
 
-%\input{content/acknowledgement} % INCLUDE: acknowledgement
-\cleardoublepage
-%
-\setcounter{tocdepth}{2}		% define depth of toc
-\tableofcontents				% display table of contents
-\cleardoublepage
-\listoffigures
-\listoftables
-% --------------------------
-% Body matter
-% --------------------------
+%\hspace*{3,6mm}\textit{Keywords:} lorem , ipsum , dolor , sit amet , lectus % Keywords
 
-\pagenumbering{arabic}			% arabic page numbering
-\setcounter{page}{1}			% set page counter
-\pagestyle{maincontentstyle} 	% fancy header and footer
+\vspace{30pt} % Some vertical space between the abstract and first section
+
+%----------------------------------------------------------------------------------------
+%	ESSAY BODY
+% ----------------------------------------------------------------------------------------
 
 \input{content/introduction}
 \input{content/theory} 
@@ -149,34 +105,13 @@
 \input{content/results} 
 \input{content/discussion} 
 \input{content/conclusion} 
-\cleardoublepage
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
 
-% --------------------------
-% Back matter
-% --------------------------
-{%
-\setstretch{1.1}
-\renewcommand{\bibfont}{\normalfont\small}
-\setlength{\biblabelsep}{0pt}
-\setlength{\bibitemsep}{0.5\baselineskip plus 0.5\baselineskip}
-\printbibliography[nottype=online]
-\printbibliography[heading=subbibliography,title={Webseiten},type=online,prefixnumbers={@}]
-}
-\cleardoublepage
+\bibliographystyle{ieeetr}
+\bibliography{references}
 
-%\cleardoublepage
+%----------------------------------------------------------------------------------------
 
-%\cleardoublepage
-
-%\input{content/colophon}
-%\cleardoublepage
-
-%\input{content/declaration}
-\clearpage
-\newpage
-\mbox{}
-
-% **************************************************
-% End of Document CONTENT
-% **************************************************
 \end{document}

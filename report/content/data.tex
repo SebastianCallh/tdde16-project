@@ -1,2 +1,49 @@
 \chapter{Data}
-The data was provided by a competition on the website Kaggle for identifying toxic comments~\cite{toxic-kaggle}. It contains 
+The data was provided by a competition on the website Kaggle for
+identifying various types of comments~\cite{toxic-kaggle}. It contains
+Wikipedia comments in plain text together with labels indicating toxic
+behaviour.
+
+\begin{table}[H]
+  \centering
+  \caption{Example comments with their labels.}    
+  \label{tbl:comments}
+  \resizebox{14cm}{!}{%
+\begin{tabular}{l|ccccccc}
+comment text &  toxic &  severe toxic &  obscene &  threat &  insult
+  &  identity hate \\
+  \hline
+  "\textbackslash n Sure, but the lead must briefly summarize ... &      0 &             0 &        0 &       0 &       0 &              0 \\
+TFD \textbackslash n\textbackslash nI think we just eced. I think we respo... &      0 &             0 &        0 &       0 &       0 &              0 \\
+ You are gay or antisemmitian? \textbackslash n\textbackslash nArchangel WH... &      1 &             0 &        1 &       0 &       1 &              1 \\
+           FUCK YOUR FILTHY MOTHER IN THE ASS, DRY! &      1 &             0 &        1 &       0 &       1 &              0 \\
+  I'm Sorry \textbackslash n\textbackslash nI'm sorry I screwed around with ... &      1 &             0 &        0 &       0 &       0 &              0 \\
+  I don't believe the Lisak criticism present th... &      0 &             0 &        0 &       0 &       0 &              0 \\
+  You had a point, and it's now ammended with ap... &      0 &             0 &        0 &       0 &       0 &              0 \\
+  In other words, you're too lazy to actually po... &      0 &             0 &        0 &       0 &       0 &              0 \\
+  "\textbackslash nAs for your claims of ""stalking"", that is... &      0 &             0 &        0 &       0 &       0 &              0 \\
+  "::::Jmabel; in regards to predominant scholar... &      0 &             0 &        0 &       0 &       0 &              0 \\
+\end{tabular}
+  }
+\end{table}
+The different labels of the comments were ``toxic'', ``severe toxic'' ,
+``obscene'', ``threat'', ``insult'', and ``identity hate''. Some
+truncated comments and their labels can be seen in
+Table~\ref{tbl:comments}. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{graphics/label-dist}
+  \caption{The count of different labels. Since labels are independent,
+    one comment can contribute to several label counts.}\label{fig:labels-dist}
+\end{figure}
+The data was skewed towards unflagged comments. Figure~\ref{fig:labels-dist} show the counts of the
+different labels, where it can be seen that the labels ``severe
+toxic'', ``threat'' and ``identity hate'' are increadibly uncommon,
+for instance.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{graphics/comment-word-count}
+  \caption{Density plot of comment word counts.}\label{fig:comment-word-count}
+\end{figure}
+Plotting the word count of the comments show that almost all comments
+have less than 200 words in them.
