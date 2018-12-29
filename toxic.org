@@ -76,12 +76,12 @@
       test = pd.read_csv('./toxic/test.csv')
       truth = pd.read_csv('./toxic/test_labels.csv')
       tags = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
-
+      print(train[['comment_text'] + tags][40:50].to_latex()) 
     #+END_SRC
 
     #+RESULTS:
     #+BEGIN_EXPORT latex
-    # Out[34]:
+    # Out[47]:
     #+END_EXPORT
 
     #+BEGIN_SRC ipython :session s
