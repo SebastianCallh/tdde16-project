@@ -1,0 +1,7 @@
+0.11184655923279617
+111846 null embeddings out of 999995
+
+this is with the code from https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
+0.47154635773178866
+471544 null embeddings out of 999995
+embedding matrix dim: (610659, 300)

@@ -1,0 +1,31 @@
+
+     def all_metrics(ms, i):
+	 recall = keras_metrics.recall(label=0)
+	 precision = keras_metrics.precision(label=0)
+	 f1_score = keras_metrics.f1_score(label=0)
+	 return ms + [recall, precision, f1_score]
+
+     metrics = reduce(all_metrics, range(len(tags)), [])
+     print(metrics)
+
+     m.compile(loss='binary_crossentropy',
+	       optimizer='adam',
+	       metrics=['accuracy'] + metrics)
+
+     [0.05202861675993947,
+     0.9810059753965804,
+     0.5429352997081002,
+     0.6715210355888273,
+     0.6004208370448019,
+     0.5429352997081002,
+     0.6715210355888273,
+     0.6004208370448019,
+     0.5429352997081002,
+     0.6715210355888273,
+     0.6004208370448019,
+     0.5429352997081002,
+     0.6715210355888273,
+     0.6004208370448019,
+     0.5429352997081002,
+     0.6715210355888273,
+     0.6004208370448019]

@@ -1,0 +1,50 @@
+Accuracy: 0.9498890243521211
+              precision    recall  f1-score   support
+
+          ok       1.00      0.95      0.97     63611
+severe_toxic       0.07      0.59      0.12       367
+
+   micro avg       0.95      0.95      0.95     63978
+   macro avg       0.53      0.77      0.55     63978
+weighted avg       0.99      0.95      0.97     63978
+
+Accuracy: 0.909468879927475
+              precision    recall  f1-score   support
+
+          ok       0.98      0.92      0.95     60287
+     obscene       0.36      0.71      0.48      3691
+
+   micro avg       0.91      0.91      0.91     63978
+   macro avg       0.67      0.82      0.71     63978
+weighted avg       0.95      0.91      0.92     63978
+
+Accuracy: 0.9722873487761418
+              precision    recall  f1-score   support
+
+          ok       1.00      0.98      0.99     63767
+      threat       0.01      0.09      0.02       211
+
+   micro avg       0.97      0.97      0.97     63978
+   macro avg       0.50      0.53      0.50     63978
+weighted avg       0.99      0.97      0.98     63978
+
+Accuracy: 0.9085466879239739
+              precision    recall  f1-score   support
+
+          ok       0.98      0.92      0.95     60551
+      insult       0.33      0.66      0.44      3427
+
+   micro avg       0.91      0.91      0.91     63978
+   macro avg       0.65      0.79      0.69     63978
+weighted avg       0.94      0.91      0.92     63978
+
+Accuracy: 0.9528587952108537
+               precision    recall  f1-score   support
+
+           ok       0.99      0.96      0.98     63266
+identity_hate       0.09      0.38      0.15       712
+
+    micro avg       0.95      0.95      0.95     63978
+    macro avg       0.54      0.67      0.56     63978
+ weighted avg       0.98      0.95      0.97     63978
+
