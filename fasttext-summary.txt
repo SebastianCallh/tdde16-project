@@ -1,31 +1,15 @@
-
-     def all_metrics(ms, i):
-	 recall = keras_metrics.recall(label=0)
-	 precision = keras_metrics.precision(label=0)
-	 f1_score = keras_metrics.f1_score(label=0)
-	 return ms + [recall, precision, f1_score]
-
-     metrics = reduce(all_metrics, range(len(tags)), [])
-     print(metrics)
-
-     m.compile(loss='binary_crossentropy',
-	       optimizer='adam',
-	       metrics=['accuracy'] + metrics)
-
-     [0.05202861675993947,
-     0.9810059753965804,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019]
+recall:
+ toxic            0.783885
+severe_toxic     0.570762
+obscene          0.726861
+threat           0.504785
+insult           0.668292
+identity_hate    0.535741
+dtype: float64
+precision:
+ toxic            0.680523
+severe_toxic     0.804825
+obscene          0.806071
+threat           0.967890
+insult           0.802576
+identity_hate    0.966079

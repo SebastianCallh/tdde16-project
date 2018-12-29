@@ -38,9 +38,8 @@
     train = pd.read_csv('./toxic/train.csv')
     test = pd.read_csv('./toxic/test.csv')
     truth = pd.read_csv('./toxic/test_labels.csv')
-    tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
-
-
+    tags = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
+    
     max_tweet_length = 140
     EMBEDDING_DIM = 300
     MAX_N_WORDS = 20000 # n most common words to use
@@ -51,6 +50,11 @@
     test_and_truth = test.merge(truth).query('threat != -1')
     test_docs = test_and_truth.comment_text.tolist() 
   #+end_src
+
+  #+RESULTS:
+  :RESULTS:
+  # Out[1]:
+  :END:
 
 ** Exploring the data
     #+BEGIN_SRC ipython :session s :async :results latex
@@ -136,60 +140,7 @@
     [[file:./obipy-resources/mEM2xZ.png]]
     :END:
 
-<<<<<<< HEAD
-  First off let's tokenize the words. This will give integer representations for all words.
-  We will filter out words stop words in the process. The stop words have been augmented with some 
-  tokens found while manually inspecting the data.
-  #+BEGIN_SRC ipython :session s 
-    from functools import reduce
-    from nltk.corpus import stopwords
-    import re
 
-    stop_words = set(stopwords.words('english'))
-    stop_words.update(['==', '-', ':', '.', '"', '-', '|', '<', '>', '^', '|-',
-		       '/', 'i\'m', 'i\'ve', 'that\'s'])
-    def sanitize(w: str) -> str:
-	stop_chars = ['"', '\'', ',', '\(', '\)', '\[', '\]', '{', '}', '<', '>', '|', '\?', '\!']
-	return reduce(lambda w, c: re.sub(c, '', w), stop_chars, w)
-
-    def pre_process(doc: List[str]) -> List[str]:
-	return [
-	    sanitize(w.lower()) for w in doc.split() 
-	    if w.lower() not in stop_words
-	    and len(sanitize(w.lower())) > 0
-	]
-
-    train_processed = [pre_process(d) for d in train_docs]
-    test_processed = [pre_process(d) for d in test_docs]
-
-    tokenizer = Tokenizer(num_words=MAX_N_WORDS)
-    tokenizer.fit_on_texts(train_processed + test_processed)
-    word_index = tokenizer.word_index
-
-    train_X = pad_sequences(
-	tokenizer.texts_to_sequences(train_processed), 
-	maxlen=MAX_SEQ_LEN)
-    test_X = pad_sequences(
-	tokenizer.texts_to_sequences(test_processed), 
-	maxlen=MAX_SEQ_LEN)
-
-    train_Y = train[tags]
-    test_Y = test_and_truth[tags]
-    print('Shape of data tensor:', train_X.shape)
-    print('Shape of label tensor:', train_Y.shape)
-    print('Shape of test data tensor:', test_X.shape)
-    print('Shape of test label tensor:', test_Y.shape)
-  #+END_SRC
-
-#+BEGIN_SRC ipython :session s
-    np.savetxt('train-x.txt', train_X, fmt='%d')
-    np.savetxt('train-y.txt', train_Y, fmt='%d')
-    np.savetxt('test-x.txt', test_X, fmt='%d')
-    np.savetxt('test-y. txt', test_Y, fmt='%d')
-#+END_SRC
-
-=======
->>>>>>> 3444eb55befe96532ee2a6b2bcc32169c0df6b9d
 ** Naive Bayes
    #+BEGIN_SRC ipython :results output :async t :session s :async
      from sklearn.naive_bayes import ComplementNB
@@ -251,187 +202,252 @@
    d2v.train(docs, total_examples=len(docs), epochs=10)
  #+END_SRC
  
-** Embeddings with FastText
-   Load embeddings.
+
+** RNNS
+   This section covers the implementation of LSTM with a trained embedding layer and one using pre-trained FastText embeddings.
+*** Pre-process
+    We'll start off by doing some pre-processing common for both implementations. First up is sanitizing the imput and filtering it through stop words that have been augmented with some tokens found while manually inspecting the data.
+   #+BEGIN_SRC ipython :session s 
+     from functools import reduce
+     from nltk.corpus import stopwords
+     import re
+
+     stop_words = set(stopwords.words('english'))
+     stop_words.update(['==', '-', ':', '.', '"', '-', '|', '<', '>', '^', '|-',
+			'/', 'i\'m', 'i\'ve', 'that\'s'])
+     def sanitize(w: str) -> str:
+	 stop_chars = ['"', '\'', ',', '\(', '\)', '\[', '\]', '{', '}', '<', '>', '|', '\?', '\!']
+	 return reduce(lambda w, c: re.sub(c, '', w), stop_chars, w)
+
+     def pre_process(doc: List[str]) -> List[str]:
+	 return [
+	     sanitize(w.lower()) for w in doc.split() 
+	     if w.lower() not in stop_words
+	     and len(sanitize(w.lower())) > 0
+	 ]
+
+     train_processed = [pre_process(d) for d in train_docs]
+     test_processed = [pre_process(d) for d in test_docs]
+
+     tokenizer = Tokenizer(num_words=MAX_N_WORDS)
+     tokenizer.fit_on_texts(train_processed + test_processed)
+     word_index = tokenizer.word_index
+
+     train_X = pad_sequences(
+	 tokenizer.texts_to_sequences(train_processed), 
+	 maxlen=MAX_SEQ_LEN)
+     test_X = pad_sequences(
+	 tokenizer.texts_to_sequences(test_processed), 
+	 maxlen=MAX_SEQ_LEN)
+
+     train_Y = train[tags]
+     test_Y = test_and_truth[tags]
+     print('Shape of data tensor:', train_X.shape)
+     print('Shape of label tensor:', train_Y.shape)
+     print('Shape of test data tensor:', test_X.shape)
+     print('Shape of test label tensor:', test_Y.shape)
+   #+END_SRC
+
+   #+RESULTS:
+   : # Out[3]:
+
+   Since filtering takes quite some time we save the data sets for later use.
+   #+BEGIN_SRC ipython :session s
+     np.savetxt('train-x.txt', train_X, fmt='%d')
+     np.savetxt('train-y.txt', train_Y, fmt='%d')
+     np.savetxt('test-x.txt', test_X, fmt='%d')
+     np.savetxt('test-y. txt', test_Y, fmt='%d')
+   #+END_SRC
+
+
+   We also define a function for evaluating a trained model on test data.
+    #+BEGIN_SRC ipython :session s 
+      def eval_model(m, X, y):
+	  preds = m.predict_proba(X) > .5
+	  p = np.sum(preds, axis=0)
+	  tp = np.sum(y, axis=0)
+	  vec_max = np.vectorize(lambda x: max(x, 0))
+	  fp = np.sum(vec_max(preds - y), axis=0)
+	  fn = np.sum(vec_max(y - preds), axis=0)
+	  recall = tp / (tp + fn)
+	  precision = tp / (tp + fp)
+	  print('false positives:\n', fn)
+	  print('recall:\n', recall)
+	  print('precision:\n', precision)
+    #+END_SRC
+
+    #+RESULTS:
+    : # Out[4]:
+
+*** Trained embeddings
+    Let's now train an LSTM network and its embeddings.
+    #+BEGIN_SRC ipython :session s
+      from keras.models import Sequential
+      from keras.layers import Dense, LSTM
+      from keras.layers.embeddings import Embedding
+      from keras.regularizers import l2
+      import keras_metrics 
+      from functools import reduce
+      np.random.seed(1)
+
+      n_hidden = 64
+      n_epochs = 3
+      batch_size = 128
+      m = Sequential()
+      m.add(Embedding(len(word_index) + 1, 
+		      EMBEDDING_DIM, 
+		      input_length=MAX_SEQ_LEN))
+      m.add(LSTM(50))
+      m.add(Dense(len(tags), activation='sigmoid'))
+      m.compile(loss='binary_crossentropy',
+		optimizer='adam')
+
+      m.fit(train_X,
+	    train_Y,
+	    epochs=n_epochs,
+	    batch_size=batch_size)
+      eval_model(m, test_X, test_y)
+    #+END_SRC
+
+    #+RESULTS:
+    : # Out[5]:
+
+*** Embeddings with FastText
+    Now let's do the same thing, but instead of training the embedding layer we load the weights from pre trained FastText embeddings.
    #+BEGIN_SRC ipython :session s 
      import codecs
 
      embeddings = {}
      with codecs.open('./toxic/wiki-news-300d-1M.vec', encoding='utf-8') as f:
        for line in f:
-         tokens = line.rstrip().rsplit(' ')
-         word = tokens[0]
-         coefs = np.asarray(tokens[1:], dtype='float32')
-         embeddings[word] = coefs
+	 tokens = line.rstrip().rsplit(' ')
+	 word = tokens[0]
+	 coefs = np.asarray(tokens[1:], dtype='float32')
+	 embeddings[word] = coefs
      print('loaded %s word vectors' % len(embeddings))
    #+END_SRC 
-
-   #+RESULTS:
-   : # Out[4]:
 
    The first layer in the network will embed words integer tokens into a vector space using FastText embeddings. The 
    embedding is made using a custom keras embedding layer, with an embedding matrix which contains the word vector 
    for word token \(i\) on row \(i\). 
-   #+BEGIN_SRC ipython :session s 
-     n_words = min(MAX_N_WORDS, len(word_index))
-     embedding_matrix = np.vstack([
-	 embeddings.get(w) 
-	 if w in embeddings
-	 else np.empty(EMBEDDING_DIM)
-	 for w in word_index.keys() 
-     ])
-     n_null_embeddings = sum(np.all(embedding_matrix, axis=1))
+   #+BEGIN_SRC ipython :session s
+     EMBEDDING_DIM = 300
+     embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
+     n_null_embeddings = 0
+     null_words = set()
+     for word, i in word_index.items():
+       embedding_vector = embeddings.get(word)
+       if embedding_vector is not None:
+	 # words not found in embedding index will be all-zeros.
+	 embedding_matrix[i] = embedding_vector
+       else: 
+	 n_null_embeddings += 1
+	 null_words.add(word)
+
      print(str(n_null_embeddings / len(embeddings)))
      print(n_null_embeddings, "null embeddings out of",  len(embeddings))
      print('embedding matrix dim:', embedding_matrix.shape)
-   #+END_SRC
-
-#+BEGIN_SRC ipython :session s
-  EMBEDDING_DIM = 300
-  embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
-  n_null_embeddings = 0
-  null_words = set()
-  for word, i in word_index.items():
-    embedding_vector = embeddings.get(word)
-    if embedding_vector is not None:
-      # words not found in embedding index will be all-zeros.
-      embedding_matrix[i] = embedding_vector
-    else: 
-      n_null_embeddings += 1
-      null_words.add(word)
-
-  print(str(n_null_embeddings / len(embeddings)))
-  print(n_null_embeddings, "null embeddings out of",  len(embeddings))
-  print('embedding matrix dim:', embedding_matrix.shape)
-  print(list(null_words)[:50])
-#+END_SRC
-
-
-   #+BEGIN_SRC ipython :session s
-     from keras.models import Sequential
-     from keras.layers import Dense, LSTM
-     from keras.layers.embeddings import Embedding
-     from keras.regularizers import l2
-     import keras_metrics 
-     from functools import reduce
-     np.random.seed(1)
-
-     tags = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
-     #ft = FastText.load("./toxic/fasttext.bin")
-     n_hidden = 64
-     n_epochs = 3
-     batch_size = 128
-     m = Sequential()
-     m.add(Embedding(len(word_index) + 1, 
-		     EMBEDDING_DIM,
-		     input_length=MAX_SEQ_LEN,
-		     weights=[embedding_matrix],
-		     trainable=False))
-     m.add(LSTM(n_hidden, input_shape=(n_hidden, 1)))
-     m.add(Dense(len(tags), activation='sigmoid'))
-
-     def all_metrics(ms, i):
-	 recall = keras_metrics.recall(label=0)
-	 precision = keras_metrics.precision(label=0)
-	 f1_score = keras_metrics.f1_score(label=0)
-	 return ms + [recall, precision, f1_score]
-
-     metrics = reduce(all_metrics, range(len(tags)), [])
-     print(metrics)
-
-     m.compile(loss='binary_crossentropy',
-	       optimizer='adam',
-	       metrics=['accuracy'] + metrics)
-
-     m.fit(train_X,
-	   train_Y,
-	   epochs=n_epochs,
-	   batch_size=batch_size)
-   #+END_SRC
-
-   #+RESULTS:
-   : # Out[14]:
-   : : <keras.callbacks.History at 0x1de48869518>
-
-   Evaluate model
-   #+BEGIN_SRC ipython :session s 
-     scores = m.evaluate(test_X, test_Y, verbose=0)
-     scores
-   #+END_SRC
-
-   #+RESULTS:
-   #+begin_example
-   # Out[15]:
-   ,#+BEGIN_EXAMPLE
-     [0.05202861675993947,
-     0.9810059753965804,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019,
-     0.5429352997081002,
-     0.6715210355888273,
-     0.6004208370448019]
-   ,#+END_EXAMPLE
-   #+end_example
-
-   Old stuff
-   #+BEGIN_SRC ipython :session s :async t
-     from gensim.models import FastText
-     vec_size = 200
-     ft_file = "./toxic/fasttext.bin"
-     ft_vocab = test_docs + train_docs
-     ft = FastText(ft_vocab, size=vec_size, window=6, min_count=1, iter=10)
-     ft.save(ft_file)
-     #ft = FastText.load(ft_file)
-     #if w in ft.wv
-     #	 else np.empty(vec_size) 
-     embedding_matrix = np.vstack([
-	 ft.wv[w] 
-	 for w in word_index.keys()
-     ])
-
-     n_null_embeddings = sum(np.all(embedding_matrix, axis=1))
-     n_null_embeddings
+     print(list(null_words)[:50])
     #+END_SRC
 
-   #+BEGIN_SRC ipython :session s :async t
-     from gensim.models import FastText
+ #+RESULTS:
+ : # Out[11]:
+    Create network and train it. 
+    #+BEGIN_SRC ipython :session s
+      from keras.models import Sequential
+      from keras.layers import Dense, LSTM
+      from keras.layers.embeddings import Embedding
+      from keras.regularizers import l2
+      import keras_metrics 
+      from functools import reduce
+      np.random.seed(1)
 
-     def tokenize(doc: List[str]) -> List[str]:
-	 return [w.lower() for w in doc.split() 
-		 if w.isalpha()
-		 and len(w) >= min_len]
+      n_hidden = 64
+      n_epochs = 3
+      batch_size = 128
+      m = Sequential()
+      m.add(Embedding(len(word_index) + 1, 
+		      EMBEDDING_DIM,
+		      input_length=MAX_SEQ_LEN,
+		      weights=[embedding_matrix],
+		      trainable=False))
+      m.add(LSTM(n_hidden)) #, input_shape=(n_hidden, 1)))
+      m.add(Dense(len(tags), activation='sigmoid'))
 
-     min_len = 2
-     docs = train.comment_text
-     #vocab = docs.apply(tokenize)
-     #vocab = vocab[vocab.transform(lambda x: len(x) > min_len)]
-     vec_size = 200
-     ft_file = "./toxic/fasttext.bin"
-     #ft = FastText(vocab, size=vec_size, window=6, min_count=min_len, iter=10)
-     ft.save(ft_file)
-     ft = FastText.load(ft_file)
-     # Word embed stuff
+      def all_metrics(ms, i):
+	  recall = keras_metrics.recall(label=i)
+	  precision = keras_metrics.precision(label=i)
+	  f1_score = keras_metrics.f1_score(label=i)
+	  return ms + [recall, precision, f1_score]
 
-     def mean_vector_embed(ft, tokens: List[str]) -> List[int]:
-	 return np.mean([ft[t] if t in ft else np.empty(vec_size) for t in tokens], axis=0)
+      metrics = reduce(all_metrics, range(len(tags)), [])
 
-     här ska vi bygga embedding matrix och köra ett embeddinglager med den 
-     tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
-     tokens = docs.apply(tokenize)
-     mask = tokens.transform(lambda x: len(x) > min_len)
-     train_Y = train[tags][mask]
-     train_X = np.array([mean_vector_embed(ft , t) for t in tokens[mask]])
-   #+END_SRC
+      m.compile(loss='binary_crossentropy',
+		optimizer='adam',
+		metrics=metrics)
+
+      m.fit(train_X,
+	    train_Y,
+	    epochs=n_epochs,
+	    batch_size=batch_size)
+    #+END_SRC
+
+    #+RESULTS:
+    : # Out[12]:
+    : : <keras.callbacks.History at 0x1de7e1f5438>
+
+    Old stuff
+    #+BEGIN_SRC ipython :session s :async t
+      from gensim.models import FastText
+      vec_size = 200
+      ft_file = "./toxic/fasttext.bin"
+      ft_vocab = test_docs + train_docs
+      ft = FastText(ft_vocab, size=vec_size, window=6, min_count=1, iter=10)
+      ft.save(ft_file)
+      #ft = FastText.load(ft_file)
+      #if w in ft.wv
+      #	 else np.empty(vec_size) 
+      embedding_matrix = np.vstack([
+	  ft.wv[w] 
+	  for w in word_index.keys()
+      ])
+
+      n_null_embeddings = sum(np.all(embedding_matrix, axis=1))
+      n_null_embeddings
+     #+END_SRC
+
+    #+BEGIN_SRC ipython :session s :async t
+      from gensim.models import FastText
+
+      def tokenize(doc: List[str]) -> List[str]:
+	  return [w.lower() for w in doc.split() 
+		  if w.isalpha()
+		  and len(w) >= min_len]
+
+      min_len = 2
+      docs = train.comment_text
+      #vocab = docs.apply(tokenize)
+      #vocab = vocab[vocab.transform(lambda x: len(x) > min_len)]
+      vec_size = 200
+      ft_file = "./toxic/fasttext.bin"
+      #ft = FastText(vocab, size=vec_size, window=6, min_count=min_len, iter=10)
+      ft.save(ft_file)
+      ft = FastText.load(ft_file)
+      # Word embed stuff
+
+      def mean_vector_embed(ft, tokens: List[str]) -> List[int]:
+	  return np.mean([ft[t] if t in ft else np.empty(vec_size) for t in tokens], axis=0)
+
+      här ska vi bygga embedding matrix och köra ett embeddinglager med den 
+      tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
+      tokens = docs.apply(tokenize)
+      mask = tokens.transform(lambda x: len(x) > min_len)
+      train_Y = train[tags][mask]
+      train_X = np.array([mean_vector_embed(ft , t) for t in tokens[mask]])
+    #+END_SRC
+
+    #+RESULTS:
+    : 0 - a7f71db2-3515-43bf-b980-f01d99ae52f1
 
 
 
