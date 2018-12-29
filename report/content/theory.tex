@@ -17,10 +17,10 @@ multinomial-dirichlet conjugacy gives the maximum a posteriori esimate
 that does not suffer the same problem, since the numerator is never $0$ even for observed counts $x_{k} = 0$.
 
 \section{FastText Word Embeddings}
-Like the word2vec model, which learns vector representations of
-words~\cite{Mikolov2013Jan}, FastText is also a technique for vector
-embedding words. However, FastText does not learn a vector for each
-word but for each charecter $n$-gram in each
+FastText is a library used to learn vector representations of
+words~\cite{Mikolov2013Jan}. However, in contrast to other
+approaches to word embeddings such as word2vec or GloVe, FastText does not learn a vector for each
+word but for each character $n$-gram in each
 word~\cite{Bojanowski2016Jul}. It also includes special start and end
 symbols <, and >, to be able to distinguish prefixes and suffixes, and
 the whole word as a special sequence. For example, the word
@@ -38,7 +38,7 @@ Recurrent Neural Networks (RNNs) are a flavour of Artificial Neural Networks (AN
   \caption{An illustration of an RNN for input sequence $x$, where $h$ is the hidden unit activation functions and $f$ a function describing the relationship between two concurrent states~\cite{goodfellow2016deep}.}\label{fig:rnn}
 \end{figure}
 An illustration of an RNN can be seen in Figure~\ref{fig:rnn} which
-shows the context-preserving connections between the hidden nodes
+shows the context-preserving connections between the hidden units
 $h^{(t)}$. There are many ways to structure RNNs depending on the
 problem at hand, but other structures are out of scope for this project.
 
@@ -49,7 +49,7 @@ LSTMs are RNNs with a more complicated cell structure for the hidden units, whic
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.8\textwidth]{graphics/lstm-cell}
+  \includegraphics[width=0.8\textwidth]{graphics/lstm}
   \caption{An illustration of an LSTM cell where $x$ is input, $y$ output and $s$ cell state for a specific time point. $\sigma$ indicates a linear combination of inputs passed through the sigmoid function. }\label{fig:lstm-cell}
 \end{figure}
 As can be seen in Figure~\ref{fig:lstm-cell} an LSTM propagates both the previous output $y^{(t-1)}$ and the previous state $s^{(t-1)}$ to the next cell. This comes at the cost of several more weights that need to be optimised during training, but is a key component for their performance.
