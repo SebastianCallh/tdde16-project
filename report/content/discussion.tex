@@ -1,2 +1,44 @@
 \chapter{Discussion}
-o hai
+This chapter discusses the validity of the results and critically
+evaluates the method used.
+
+%['year’s', 'funnyask', 'aolisms', 'hurlburt', '5-20%', 'εκκλησίας', 'cause:', 'máltilfinningu.', 'magneto-motive', '120.148.90.195', 'circumcising;', 'enough...not', 'sanhedrin.', 'edisons', 'two-parter...', '10g;', 'sarcasm==', 'wikipedia:make_technical_articles_accessible', 'multics.', 'speidels', 'link==', 'thacker', 'concerned:', 'adkeeyey', 'sdgbfhyufjfsjckfsijldxhltgfgn', 'http://www.officialcharts.com/', 'favre.', 'edittor.', 'shouries', 'htet', 'btw...', 'florentino', 'istanbul.3', 'agada', 'distinct...', 'ss=wikitable', 'periods/sentences.', 'bandelier', 'armeniens', '18:14', 'dictators.', 'iceage', 'team’s', '==ruler==', 'වාසභුමිය', 'user:thedeletator', 'wp:npov:as', 'توانیم', 'spam/commerical', '.आपल्या']
+
+\section{Data pre-processing}
+The pre-processing step leaves a lot of room for improvement. A much
+more thorough investigation of the data and the pre-trained embeddings
+should have been performed to find more relevant rules for
+sanitisation and stop words. 
+
+\subsection{The large number of null embeddings}
+The number of null embeddings was 47\%, which means that around half
+of the training data was practically useless. Needless to say, that is
+a terrible result. Investigating the
+problematic words show a mix of nonsense, spelling errors, non-English
+words, and web addresses, but also several words that could have been found if sanitisation was
+done more rigorously. Example of these words are ``year’s'' and
+``cause:'', which would have been a non-issue if accents and colons
+were sanitised. There might also be several undiscovered cases where a proper
+word is simply represented on a different form in the pre-trained
+embeddings than in the vocabulary, such as there not being an embedding for the word
+``that's'', but one for ``thats''.
+
+\section{Model performances}
+The baseline Naive Bayes performed admirably, and while its precision was quite a
+bit worse than the LSTM models, it had the best recall of all
+models. However, the LSTM models were only trained for 3 epochs
+because of time constrains, and no parameter optimisation was
+performed. So while the Naive Bayes model is as good as it gets, the
+LSTM models most certainly have a lot of room for improvement, such as
+training with early stopping, and using grid search to optimise hyper-parameters.
+
+Another aspect to consider is the amount of data required to train a
+model. A Neural Network requires much more data than a Naive Bayes
+model to reach adequate performance, and so in situations with lower
+data volumes, Naive Bayes is hypothesised to outperform the LSTM
+models. It would be interesting to evaluate model performance for
+different data volumes, but such an investigation has been discarded
+because of time constraints. 
+
+In light of this discussion, performance of the LSTM models should be
+seen as a baseline, with lots of areas of improvement.
