@@ -1,15 +1,61 @@
 \chapter{Results}
 
-\begin{center}
-  \caption{Performance of the Naive Bayes models for the different data labels. }
-  \label{tbl:nb-performance}
-  \begin{tabular}{l|rrr}
-    Label & Precision & Recall & F1-score\\
-    \hline
-    Severe toxic & 0.99 & 0.95 & 0.97\\
-    Obscene & 0.95 & 0.91 & 0.92\\
-    Threat & 0.99 & 0.97 & 0.98\\
-    Insult & 0.94 & 0.91 & 0.92\\
-    Identity hate & 0.98 & 0.95 & 0.97\\
+\begin{table}[H]
+  \centering
+  \caption{Performance of the Naive Bayes 
+    models for the different data labels.}\label{tbl:nb-performance}
+ \begin{tabular}{l | r  r | r  r | r  r }
+   & \multicolumn{2}{c}{Naive Bayes} & \multicolumn{2}{c}{LSTM} &
+                                                                  \multicolumn{2}{c}{LSTM w. FastText} \\
+    Label         & Precision & Recall & Precision & Recall & Precision & Recall \\
+    \hline 
+    Severe toxic  & 0.53 & 0.77 \\
+    Obscene       & 0.67 & 0.82 \\
+    Threat        & 0.50 & 0.53 \\
+    Insult        & 0.65 & 0.79 \\
+    Identity hate & 0.54 & 0.67 \\
   \end{tabular}
-\end{center}
+\end{table}
+
+lstm     0.59, 0.61
+fasttext 0.54, 0.67
+
+\begin{tabular}{ |l|l|l| }
+  \hline
+  \multicolumn{3}{ |c| }{Team sheet} \\
+  \hline
+  Goalkeeper & GK & Paul Robinson \\ \hline
+  \multirow{2}{*}{Naive Bayes} & LB & Lucas Radebe \\
+             & DC & Michael Duburry \\
+  \multirow{2}{*}{LSTM} & MC & David Batty \\
+             & MC & Eirik Bakke \\
+  Forward & FW & Jamie McMaster \\ \hline
+  \multirow{2}{*}{LSTM w. FastText} & ST & Alan Smith \\
+             & ST & Mark Viduka \\
+  \hline
+\end{tabular}
+
+% \begin{table}[H]
+%   \centering
+%   \caption{Model MAE \textit{(s)} and MAPE \textit{(\%)} for test trajectories from Bus 3}
+%   \label{tbl:models-mae-and-mape-203}
+%   \begin{tabular}{l | l | l || l | l | l || l | l | l || l | l | l || l | l | l | }
+% %    & \multicolumn{3}{c}{Severe toxic}
+% %    & \multicolumn{3}{c}{Obscene}
+% %    & \multicolumn{3}{c}{Threat}
+% %    & \multicolumn{3}{c}{Insult}
+% %    & \multicolumn{3}{c}{Identity hate} \\
+%     Naive Bayes
+%     \hline \\
+%      & 14.9 & 14.9 & 14.9 & 14.9  & 27 & 37 & 56 & 119 \\
+%     NN - M1        & 14.79& 14.8& 14.79& 14.79& 30& 41& 61& 123 \\
+%     NN - M2        & 10.34& 6.78& 6.77& 1.96& 13& 12& 14& \textbf{11} \\
+%     NN - M3       & 10.26& 6.41& 6.68& 2.05& 13& 11& 14& \textbf{11}\\
+%     NN - M4        & 10.91& 5.8& 5.77& 1.84& 13& 10& 12& \textbf{11} \\
+%     NN - M1 compr.       & 12.02& 12.02& 12.02& 12.02& 35& 47& 71& 145 \\
+%     NN - M2 compr.       & 3.81& 3.49& 2.58& \textbf{1.57}& \textbf{8}& \textbf{9}& \textbf{11}& 15 \\
+%     NN - M3 compr.       & \textbf{3.66}& \textbf{3.19}& \textbf{2.38}& 1.67& \textbf{8}& \textbf{9}& \textbf{11}& 16 \\
+%     NN - M4 compr.       & 3.67& 3.6& 2.62& 1.69& \textbf{8} & 10& 13& 18 \\
+%     GPR        &  12.17 & 10.72 & 10.75 & 13.42 & 26 &  34 & 61 &  155  \\
+%   \end{tabular}
+% \end{table}

@@ -1,27 +1,44 @@
 \chapter{Method}
 This chapter describes the data pre-processing and the implementation
 process. The implementation goal was to create functional
-implementation of an LSTM network using pre-trained FastText embeddings and a
-Naive Bayes classifier.
+implementation of an LSTM network using pre-trained FastText
+embeddings~\cite{joulin2016bag,joulin2016fasttext}, and a Naive Bayes classifier.
 
 \section{Pre-processing}
 The first step was to sanitise the comments using regex
-substitution. The pre-trained embeddings 
+substitution. Stop words from the Python NLTK~\cite{nltk-stopwords}
+was used, together with custom rewrites removing parentheses, brackets, hyphens,
+and performing additional rewrites to get the corpus on a format
+compatible with the pre-trained embeddings. An example of these
+rewrites were removing apostrophes, such that the word
+\textit{shouldn't} mapped to \textit{shouldnt}.
 
 \section{Naive Bayes Baseline model}
-Because 
+Building on the assumption that some key words are enough to identify the
+category of a document, a Naive Bayes model was used as a baseline
+model. Scikit-learn~\cite{scikit-learn} was used for the
+implementation, both for the tokenisation and the classifier.
 
-\section{LSTM Network}
+\section{LSTM Network}\label{sec:lstm}
+It reasonable to believe that a sequence of words carry more
+information than a single word without context, and that a model using
+sequences would perform better than a model that does not. For this, an LSTM
+network was used, implemented using the Keras
+framework~\cite{chollet2015keras}. The network had one embedding layer (which computed words embeddings,
+optimised like the rest of the network), one LSTM layer with 50 hidden
+units, and one output layer with the sigmoid activation function.
 
-\section{LSTM Network with FastText Embeddings}
-To improve the performance of he LSTM model, FastText word embeddings
-were investigated. When people from many different countries
-communicate online using English, spelling errors are unavoidable.  
-
-naive bayes as baseline
-
-introduce naive LSTM
-
-argue for FastText and online slang
-
-run LSTM with FastText embeddings
+Hyper-parameters for the implementation
+was picked manually base on inspecting the data. Maximum sequence length was set
+to 200 (all sequences shorter were zero padded to this length), only
+the 20000 most common words were tokenised, and the dimension of the
+embeddings was 300.
+ 
+Because of frequent misspellings in online conversations,
+it is reasonable to believe that words that are very similar could
+mean the same thing. Since FastText use the substructure of words when
+making embeddings, it was hypothesised that it could capture
+some misspellings and improve performance. A network with the same
+structure and parameters described previously, but with a FastText embedding layer was
+consequently implemented and evaluated. This was done by manually
+assigning the weights of the embedding layer and freezing it during training~\cite{keras-using-embeddings}.
