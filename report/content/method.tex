@@ -19,21 +19,26 @@ category of a document, a Naive Bayes model was used as a baseline
 model. Scikit-learn~\cite{scikit-learn} was used for the
 implementation, both for the tokenisation and the classifier.
 
-\section{LSTM Network}\label{sec:lstm}
+\section{LSTM networks}\label{sec:lstm}
 It reasonable to believe that a sequence of words carry more
 information than a single word without context, and that a model using
-sequences would perform better than a model that does not. For this, an LSTM
-network was used, implemented using the Keras
-framework~\cite{chollet2015keras}. The network had one embedding layer (which computed words embeddings,
-optimised like the rest of the network), one LSTM layer with 50 hidden
-units, and one output layer with the sigmoid activation function.
+sequences would perform better than a model that does not. For this,
+two slightly different LSTM networks were used, implemented using the
+Keras framework~\cite{chollet2015keras}. The difference of the two
+networks was the embeddings they used. The first network used an
+embedding layer which learned the embeddings as part of the network
+training process, and the second used pre-trained FastText embeddings.
 
-Hyper-parameters for the implementation
-was picked manually base on inspecting the data. Maximum sequence length was set
+\subsection{With learned embeddings}
+The first network had one embedding layer, one LSTM layer with 50 hidden
+units, and one output layer with the sigmoid activation
+function. Hyper-parameters for the implementation
+were picked manually base on inspecting the data. Maximum sequence length was set
 to 200 (all sequences shorter were zero padded to this length), only
-the 20000 most common words were tokenised, and the dimension of the
-embeddings was 300.
- 
+the 15000 most common words were tokenised, and the embedding
+dimension was 300. The network was trained for 3 epochs.
+
+\subsection{With FastText embeddings} 
 Because of frequent misspellings in online conversations,
 it is reasonable to believe that words that are very similar could
 mean the same thing. Since FastText use the substructure of words when
@@ -42,3 +47,5 @@ some misspellings and improve performance. A network with the same
 structure and parameters described previously, but with a FastText embedding layer was
 consequently implemented and evaluated. This was done by manually
 assigning the weights of the embedding layer and freezing it during training~\cite{keras-using-embeddings}.
+47\% of words were not found in the pre-trained embeddings, and were simply
+embedded as the null vector.
