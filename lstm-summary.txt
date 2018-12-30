@@ -1,22 +1,15 @@
-Loss: 0.06
-Accuracy: 0.98
-
-tags = ['severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'] 
-
-def all_metrics(ms, i):
-	 recall = keras_metrics.recall(label=0)
-	 precision = keras_metrics.precision(label=0)
-	 f1_score = keras_metrics.f1_score(label=0)
-	 return ms + [recall, precision, f1_score]
-
-
-  [0.055834723581017015, 0.59217411987878, 
-  0.618509316762503, 0.6050552422753933, 
-  0.59217411987878, 0.618509316762503, 
-  0.6050552422753933, 0.59217411987878, 
-  0.618509316762503, 0.6050552422753933, 
-  0.59217411987878, 0.618509316762503, 
-  0.6050552422753933, 0.59217411987878, 
-  0.618509316762503, 0.6050552422753933]
-
-
+recall:
+ toxic            0.804279
+severe_toxic     0.590032
+obscene          0.765450
+threat           0.527500
+insult           0.730081
+identity_hate    0.576985
+dtype: float64
+precision:
+ toxic            0.649323
+severe_toxic     0.693762
+obscene          0.740867
+threat           0.833992
+insult           0.708204
+identity_hate    0.791991
