@@ -1,39 +1,35 @@
 \chapter{Results}
+This section presents the performance of the models in the form of precision and recall.
 
 \begin{table}[H]
   \centering
-  \caption{Performance of the Naive Bayes 
-    models for the different data labels.}\label{tbl:nb-performance}
- \begin{tabular}{l | r  r | r  r | r  r }
-   & \multicolumn{2}{c}{Naive Bayes} & \multicolumn{2}{c}{LSTM} &
-                                                                  \multicolumn{2}{c}{LSTM w. FastText} \\
-    Label         & Precision & Recall & Precision & Recall & Precision & Recall \\
+  \caption{Precision of the difference models by label.}\label{tbl:models-precision}
+ \begin{tabular}{l | c c c}
+    Label         & Naive Bayes & LSTM & LSTM w. FastText \\
     \hline 
-    Severe toxic  & 0.53 & 0.77 \\
-    Obscene       & 0.67 & 0.82 \\
-    Threat        & 0.50 & 0.53 \\
-    Insult        & 0.65 & 0.79 \\
-    Identity hate & 0.54 & 0.67 \\
+    Toxic         & \textbf{0.70} & 0.64 & 0.68 \\
+    Severe toxic  & 0.53 & 0.69 & \textbf{0.80} \\
+    Obscene       & 0.67 & 0.74 & \textbf{0.80} \\
+    Threat        & 0.50 & 0.83 & \textbf{0.96} \\
+    Insult        & 0.65 & 0.70 & \textbf{0.80} \\
+    Identity hate & 0.54 & 0.79 & \textbf{0.96} \\
   \end{tabular}
 \end{table}
 
-lstm     0.59, 0.61
-fasttext 0.54, 0.67
-
-\begin{tabular}{ |l|l|l| }
-  \hline
-  \multicolumn{3}{ |c| }{Team sheet} \\
-  \hline
-  Goalkeeper & GK & Paul Robinson \\ \hline
-  \multirow{2}{*}{Naive Bayes} & LB & Lucas Radebe \\
-             & DC & Michael Duburry \\
-  \multirow{2}{*}{LSTM} & MC & David Batty \\
-             & MC & Eirik Bakke \\
-  Forward & FW & Jamie McMaster \\ \hline
-  \multirow{2}{*}{LSTM w. FastText} & ST & Alan Smith \\
-             & ST & Mark Viduka \\
-  \hline
-\end{tabular}
+\begin{table}[H]
+  \centering
+  \caption{Recall of the different models by label.}\label{tbl:models-recall}
+ \begin{tabular}{l | c c c}
+    Label         & Naive Bayes & LSTM & LSTM w. FastText \\
+    \hline 
+    Toxic         & \textbf{0.83} & 0.80 & 0.68 \\
+    Severe toxic  & \textbf{0.77} & 0.59 & 0.57 \\
+    Obscene       & \textbf{0.82} & 0.76 & 0.72 \\
+    Threat        & \textbf{0.53} & 0.52 & 0.50 \\
+    Insult        & \textbf{0.79} & 0.73 & 0.66 \\
+    Identity hate & \textbf{0.67} & 0.57 & 0.53 \\
+  \end{tabular}
+\end{table}
 
 % \begin{table}[H]
 %   \centering
